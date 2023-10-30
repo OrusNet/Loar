@@ -1,0 +1,13 @@
+{
+  "name": "loarjs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "start": ".env/bin/python loar.py app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
