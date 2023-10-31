@@ -4,13 +4,17 @@ from os import system, listdir, path
 from json import dump, dumps, loads
 from threading import Thread
 from time import sleep
+from random import randint
 
 parent = path.dirname(__file__).replace('\\', '/')+'/'
 if 'kernel' in listdir(parent):
     print(parent+'kernel')
 
+class OBJECTS:
+    _ = 0
+
 #The modules imported will be here (These are just types do not touch them)
-M = {'int': int, 'str': str, 'bool': bool, 'NoneType': type(None), 'dict':  dict, 'list':  list}
+M = {'int': int, 'str': str, 'bool': bool, 'NoneType': type(None), 'dict':  dict, 'list':  list, 'LOAR_OBJECTS': OBJECTS}
 
 def classTree(classObj, allowedTypes=[int, str, bool, type(None), dict, list], c=False, dirc='', importAttrs={}):
     classDict = {}
@@ -95,7 +99,7 @@ while(1):
             args = []
             kwargs = {}
             for xfy in x['send']['args']:
-                if xfy.startswith('<LoarObject<') and xfy.endswith('>LoarObject>'):
+                if str(xfy).startswith('<LoarObject<') and str(xfy).endswith('>LoarObject>'):
                     xfy = type(xfy)(str(xfy).removeprefix('<LoarObject<').removesuffix('>LoarObject>'))
                     Afy=''
                     for iify, ify in enumerate(str(xfy).split('.')):
@@ -118,6 +122,10 @@ while(1):
                 else:
                     kwargs[xf[0]] = xfy
             B = A(*args, **kwargs)
+            if callable(B):
+                B_id = str('_'+str(randint(1000000000, 9999999999)))
+                setattr(M['LOAR_OBJECTS'], B_id, B)
+                B = '<LoarObject<'+B_id+'>LoarObject>'
             output = {'send': {}, 'recv': {'return': B}}
         send(output)
         sleep(.04)
