@@ -92,8 +92,31 @@ while(1):
                     A = M[i]
                 else:
                     A = getattr(A, i)
-            args = x['send']['args']
-            kwargs = x['send']['kwargs']
+            args = []
+            kwargs = {}
+            for xfy in x['send']['args']:
+                if xfy.startswith('<LoarObject<') and xfy.endswith('>LoarObject>'):
+                    xfy = type(xfy)(str(xfy).removeprefix('<LoarObject<').removesuffix('>LoarObject>'))
+                    Afy=''
+                    for iify, ify in enumerate(str(xfy).split('.')):
+                        if iify==0:Afy = M[ify]
+                        else:Afy = getattr(Afy, ify)
+                    args.append(Afy)
+                else:
+                    args.append(xfy)
+
+            for xf in dict(x['send']['kwargs']).items():
+                xfy = xf[1]
+                if str(xfy).startswith('<LoarObject<') and str(xfy).endswith('>LoarObject>'):
+                    xf = [xf[0], str(xf[1]).removeprefix('<LoarObject<').removesuffix('>LoarObject>')]
+                    xfy = xf[1]
+                    Afy=''
+                    for iify, ify in enumerate(str(xfy).split('.')):
+                        if iify==0:Afy = M[ify]
+                        else:Afy = getattr(Afy, ify)
+                    kwargs[xf[0]] = Afy
+                else:
+                    kwargs[xf[0]] = xfy
             B = A(*args, **kwargs)
             output = {'send': {}, 'recv': {'return': B}}
         send(output)

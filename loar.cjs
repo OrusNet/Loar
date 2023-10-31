@@ -1,4 +1,5 @@
 const fs = require('fs');
+const { loadavg, type } = require('os');
 function read(){
     var x = JSON.parse(fs.readFileSync('ULP.json', 'utf8'))
     while (Object.keys(x['recv']).length === 0){
@@ -30,14 +31,27 @@ function treeVar(node, path='', disallowedPaths=[]) {
         } else if (node === 'LOAR<func>LOAR') {
             return function (...args) {
                 var posArgs = []
-                var kwargs = {}
+                var kwargs = {'loarCheck': false}
                 args.forEach(arg => {
                     if (typeof arg === 'object') {
-                        Object.assign(kwargs, arg);
-                    } else {
-                        posArgs.push(arg);
+                        for (let v in arg){
+                            if (typeof arg[v] === 'function'){
+                                var xv = arg[v]({'loarCheck': true});
+                                kwargs[String(v)] = String(xv);
+                            }
+                            else{kwargs[v] = arg[v];}
+                        }
+
                     }
+                    else if (typeof arg === 'function'){
+                        var xv = arg({'loarCheck': true});
+                        posArgs.push(xv);
+                    }
+                    else{posArgs.push(arg)}
                 });
+                // console.log(kwargs, posArgs, path)
+                if (kwargs['loarCheck']){return '<LoarObject<'+path+'>LoarObject>';}
+                delete kwargs['loarCheck']
                 write({'send': {'type': 2, 'attr': path, 'args': posArgs, 'kwargs': kwargs}, 'recv': {}});
                 a = read()
                 return a['return'];
@@ -54,4 +68,4 @@ function importModule(moduleName, importAttrs={}, disallowedPaths=[], allowedTyp
     return treeVar(x['tree'], moduleName, disallowedPaths);
 }
 
-module.exports = {importModule}
+module.exports = { importModule }
