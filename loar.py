@@ -7,8 +7,6 @@ from time import sleep
 from random import randint
 
 parent = path.dirname(__file__).replace('\\', '/')+'/'
-if 'kernel' in listdir(parent):
-    print(parent+'kernel')
 
 class OBJECTS:
     def exit_kernel(c=0):
@@ -38,21 +36,13 @@ def classTree(classObj, allowedTypes=[int, str, bool, type(None), dict, list], c
 
 def read():
     try:
-        with open('ULP.json')as f:
+        with open(parent+'.loar_kernel')as f:
             x = loads(f.read())
             return x
     except:return {'send': {}, 'recv': {}}
 
-def get():
-    with open('ULP')as f:
-        return f.read()
-
-def Set():
-    with open('ULP', 'w')as f:
-        f.write('')
-
 def send(data):
-    with open('ULP.json', 'w')as f:
+    with open(parent+'.loar_kernel', 'w')as f:
         dump(data, f)
 
 def startULPC():
@@ -139,4 +129,4 @@ while(1):
             sleep(.07)
             send(output)
         # except Exception as e:send({'send':{}, 'recv': {'return': 0, 'err': str(e)}})
-            sleep(.07)
+            sleep(.0007)

@@ -1,9 +1,9 @@
 const fs = require('fs');
-const { loadavg, type } = require('os');
+const parent = __dirname+'/';
 function read(){
-    var x = JSON.parse(fs.readFileSync('ULP.json', 'utf8'))
+    var x = JSON.parse(fs.readFileSync(parent+'.loar_kernel', 'utf8'))
     while (Object.keys(x['recv']).length === 0){
-        try{x = JSON.parse(fs.readFileSync('ULP.json', 'utf8'))}
+        try{x = JSON.parse(fs.readFileSync(parent+'.loar_kernel', 'utf8'))}
         catch (e){}
     }
     if ('err' in x['recv']){
@@ -21,12 +21,12 @@ function removeSuffix(inputString, prefix) {
 }
 
 function write(data){
-    var x = JSON.parse(fs.readFileSync('ULP.json', 'utf8'));
+    var x = JSON.parse(fs.readFileSync(parent+'.loar_kernel', 'utf8'));
     while (JSON.stringify(x['send']) !== '{}'){
-        try{x = JSON.parse(fs.readFileSync('ULP.json', 'utf8'))}
+        try{x = JSON.parse(fs.readFileSync(parent+'.loar_kernel', 'utf8'))}
         catch (e){}
     }
-    fs.writeFileSync('ULP.json', JSON.stringify(data), 'utf8');
+    fs.writeFileSync(parent+'.loar_kernel', JSON.stringify(data), 'utf8');
 }
 
 function createFunc(path){
