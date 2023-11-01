@@ -6,8 +6,18 @@ function read(){
         try{x = JSON.parse(fs.readFileSync('ULP.json', 'utf8'))}
         catch (e){}
     }
-    write({'recv': {}, 'send': x['send']})
+    if ('err' in x['recv']){
+        throw new Error(x['recv']['err']);
+    }
+    write({'recv': {}, 'send': x['send']});
     return x['recv'];
+}
+
+function removeSuffix(inputString, prefix) {
+    if (inputString.endsWith(prefix)) {
+        return inputString.substring(prefix.length);
+    }
+    return inputString;
 }
 
 function write(data){
@@ -19,7 +29,7 @@ function write(data){
     fs.writeFileSync('ULP.json', JSON.stringify(data), 'utf8');
 }
 
-function create_func(path){
+function createFunc(path){
     return function (...args) {
         var posArgs = []
         var kwargs = {'loarCheck': false}
@@ -40,30 +50,36 @@ function create_func(path){
             }
             else{posArgs.push(arg)}
         });
-        // console.log(kwargs, posArgs, path)
-        if (kwargs['loarCheck']){return '<LoarObject<'+path+'>LoarObject>';}
-        delete kwargs['loarCheck']
-        write({'send': {'type': 2, 'attr': path, 'args': posArgs, 'kwargs': kwargs}, 'recv': {}});
-        a = read()
-        if (typeof a['return'] === 'string' && a['return'].startsWith('<LoarObject<') && a['return'].endsWith('>LoarObject>')){
-            return create_func(a['return'].replace('<LoarObject<', 'LOAR_OBJECTS.').replace('>LoarObject>',''))
+        if (path!==undefined){
+            if (kwargs['loarCheck']){return '<LoarObject<'+path+'>LoarObject>';}
+            delete kwargs['loarCheck']
+            write({'send': {'type': 2, 'attr': path, 'args': posArgs, 'kwargs': kwargs}, 'recv': {}});
+            a = read()
+            if (a['return']===null){return null}
+            if (typeof a['return'] === 'string' && a['return'].startsWith('<LoarObject<') && a['return'].endsWith('>LoarObject>')){
+                return createFunc(a['return'].replace('<LoarObject<', 'LOAR_OBJECTS.').replace('>LoarObject>',''))
+                
+            } else if (typeof a['return'] === 'object'){
+                if ('LoarObject' in a['return']) {
+                return treeVar(a['return'], 'LOAR_OBJECTS.'+a['return']['LoarObject'])
+                }
+            }
+            return a['return'];
         }
-        
-        return a['return'];
     };
 }
 
 function treeVar(node, path='', disallowedPaths=[]) {
     if (!disallowedPaths.includes(path)){
-        if (typeof node === 'object' && node !== null) {
+        if (typeof node === 'object') {
             const resultObject = {};
             for (const key in node) {
                 const newPath = path ? `${path}.${key}` : key;
-                resultObject[key] = treeVar(node[key], newPath);
+                resultObject[key] = treeVar(node[key], newPath, disallowedPaths);
             }
             return resultObject;
         } else if (node === 'LOAR<func>LOAR') {
-            return create_func(path)
+            return createFunc(path);
         } else {
             return node;
         }
@@ -76,4 +92,4 @@ function importModule(moduleName, importAttrs={}, disallowedPaths=[], allowedTyp
     return treeVar(x['tree'], moduleName, disallowedPaths);
 }
 
-module.exports = { importModule, create_func }
+module.exports = { importModule, createFunc }
