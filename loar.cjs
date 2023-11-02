@@ -13,13 +13,6 @@ function read(){
     return x['recv'];
 }
 
-function removeSuffix(inputString, prefix) {
-    if (inputString.endsWith(prefix)) {
-        return inputString.substring(prefix.length);
-    }
-    return inputString;
-}
-
 function write(data){
     var x = JSON.parse(fs.readFileSync(parent+'.loar_kernel', 'utf8'));
     while (JSON.stringify(x['send']) !== '{}'){
