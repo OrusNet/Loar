@@ -1,10 +1,10 @@
 import inspect
 from sys import argv
-from os import system, listdir, path
+from os import system, path
 from json import dump, dumps, loads
 from threading import Thread
-from time import sleep
 from random import randint
+from traceback import format_exc
 
 parent = path.dirname(__file__).replace('\\', '/')+'/'
 
@@ -67,7 +67,7 @@ while(1):
     output = {}
     #if the type is 0 or import mode
     if 'type' in x['send']:
-        # try:
+        try:
             if x['send']['type']==0:
                 A = __import__(x['send']['module'])
                 M[x['send']['module']] = A
@@ -126,7 +126,5 @@ while(1):
                     setattr(M['LOAR_OBJECTS'], B_id, B['return'])
                     B['return'] = '<LoarObject<'+B_id+'>LoarObject>'
                 output = {'send': {}, 'recv': B}
-            sleep(.0007)
             send(output)
-        # except Exception as e:send({'send':{}, 'recv': {'return': 0, 'err': str(e)}})
-            sleep(.0007)
+        except Exception as e:send({'send':{}, 'recv': {'return': 0, 'err': str(format_exc())}})

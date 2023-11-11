@@ -5,7 +5,7 @@
   "main": "app.js",
   "type": "module",
   "scripts": {
-    "start": ".env/bin/python loar.py app.js"
+    "start": ".env/bin/python loar.py test.js"
   },
   "keywords": [],
   "author": "",
