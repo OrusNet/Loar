@@ -5,8 +5,18 @@ from json import dump, dumps, loads
 from threading import Thread
 from random import randint
 from traceback import format_exc
+from time import sleep
 
 parent = path.dirname(__file__).replace('\\', '/')+'/'
+
+loarConfig = {
+    "kernelFrequency": 524,
+    "virtualMemoryFrequency": 160
+}
+
+if path.exists('loarconfig.json'):
+    with open('loarconfig.json')as f:
+        loarConfig = loads(f.read())
 
 class OBJECTS:
     def exit_kernel(c=0):
@@ -128,3 +138,5 @@ while(1):
                 output = {'send': {}, 'recv': B}
             send(output)
         except Exception as e:send({'send':{}, 'recv': {'return': 0, 'err': str(format_exc())}})
+    try:sleep(1/loarConfig['kernelFrequency'])
+    except:pass

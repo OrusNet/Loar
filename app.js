@@ -2,6 +2,13 @@ import fs from 'fs';
 import * as url from 'url';
 const parent = url.fileURLToPath(new URL('.', import.meta.url));
 
+if (fs.existsSync('loarconfig.json')){
+    var loarConfig = JSON.parse(fs.readFileSync('loarconfig.json'));
+    if (loarConfig.verbose){
+        console.log('[BOOT] verbose enabled!');
+    }
+}
+
 function read(fileName='.loar_kernel'){
     var x = JSON.parse(fs.readFileSync(parent+fileName, 'utf8'))
     while (Object.keys(x['recv']).length === 0){
